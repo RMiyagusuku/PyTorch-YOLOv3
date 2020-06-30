@@ -3,10 +3,11 @@ import random
 import os
 import sys
 import numpy as np
-from PIL import Image
+#from PIL import ImageFile
+#ImageFile.LOAD_TRUNCATED_IMAGES = True
 import torch
 import torch.nn.functional as F
-
+import cv2
 from utils.augmentations import horisontal_flip
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
@@ -44,7 +45,8 @@ class ImageFolder(Dataset):
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         # Extract image as PyTorch tensor
-        img = transforms.ToTensor()(Image.open(img_path))
+        #img = transforms.ToTensor()(Image.open(img_path))
+        img = transforms.ToTensor()(cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB))
         # Pad to square resolution
         img, _ = pad_to_square(img, 0)
         # Resize
@@ -83,7 +85,8 @@ class ListDataset(Dataset):
         img_path = self.img_files[index % len(self.img_files)].rstrip()
 
         # Extract image as PyTorch tensor
-        img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
+        #img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
+        img = transforms.ToTensor()(cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB))
 
         # Handle images with less than three channels
         if len(img.shape) != 3:
